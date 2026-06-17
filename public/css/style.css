@@ -157,6 +157,13 @@ main {
   border-color: #e94560;
 }
 
+.template-hint {
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  color: #e94560;
+  font-style: italic;
+}
+
 .btn-primary {
   display: inline-block;
   background: #e94560;

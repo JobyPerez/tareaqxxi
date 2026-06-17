@@ -107,7 +107,20 @@ function showForm(data) {
   document.getElementById('qxxiUrl').value = data.qxxiUrl || '';
   document.getElementById('tipo').value = data.tipo || '';
   document.getElementById('universidad').value = data.universidad || '';
+  updateTemplateHint();
 }
+
+function updateTemplateHint() {
+  const tipo = document.getElementById('tipo').value.toLowerCase();
+  const hint = document.getElementById('template-hint');
+  if (tipo.includes('actualización de versión') || tipo.includes('actualizacion de version')) {
+    hint.textContent = 'Plantilla: Petición de instalación: pasos para la preparación y validación';
+  } else {
+    hint.textContent = 'Plantilla: Entrada QuaterniXXI petición/error de datos';
+  }
+}
+
+document.getElementById('tipo').addEventListener('input', updateTemplateHint);
 
 function showError(message) {
   loadingSection.style.display = 'none';
