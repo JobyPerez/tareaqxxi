@@ -11,8 +11,19 @@ const submitBtn = document.getElementById('submit-btn');
 const retryBtn = document.getElementById('retry-btn');
 const errorText = document.getElementById('error-text');
 const notionLink = document.getElementById('notion-link');
+const modelBadge = document.getElementById('model-badge');
 
 let currentImageBase64 = null;
+
+// Cargar configuración inicial
+fetch('/tareaqxxi/api/config')
+  .then(res => res.json())
+  .then(data => {
+    if (data.ocrModel) {
+      modelBadge.textContent = 'Modelo OCR: ' + data.ocrModel;
+    }
+  })
+  .catch(err => console.error('Error cargando config:', err));
 
 document.addEventListener('paste', (e) => {
   const items = e.clipboardData.items;

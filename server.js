@@ -51,13 +51,19 @@ app.get('/tareaqxxi/app', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'app.html'));
 });
 
+app.get('/tareaqxxi/api/config', requireAuth, (req, res) => {
+  res.json({
+    ocrModel: process.env.OCR_MODEL || 'mimo-v2.5'
+  });
+});
+
 app.post('/tareaqxxi/api/ocr', requireAuth, async (req, res) => {
   try {
     const { image } = req.body;
     if (!image) {
       return res.status(400).json({ error: 'No se recibió imagen' });
     }
-    const result = await extractFromScreenshot(process.env.OPENCODE_GO_API_KEY, image);
+    const result = await extractFromScreenshot(process.env.OPENCODE_GO_API_KEY, image, process.env.OCR_MODEL);
     res.json(result);
   } catch (error) {
     console.error('OCR error:', error);
