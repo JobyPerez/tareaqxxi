@@ -23,6 +23,21 @@ header {
 header h1 {
   font-size: 1.5rem;
   color: #e94560;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.app-icon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.45rem;
+  flex: 0 0 auto;
+}
+
+.app-icon-login {
+  display: block;
+  margin: 0 auto 0.75rem;
 }
 
 .header-right {
