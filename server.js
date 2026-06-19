@@ -8,6 +8,12 @@ const { createTask } = require('./lib/notion');
 const app = express();
 const PORT = process.env.PORT || 3012;
 
+function getOcrModels() {
+  const modelsStr = process.env.OCR_MODEL || 'mimo-v2.5';
+  const models = modelsStr.split(',').map(m => m.trim()).filter(Boolean);
+  return models.length > 0 ? models : ['mimo-v2.5'];
+}
+
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
@@ -52,10 +58,8 @@ app.get('/tareaqxxi/app', requireAuth, (req, res) => {
 });
 
 app.get('/tareaqxxi/api/config', requireAuth, (req, res) => {
-  const modelsStr = process.env.OCR_MODEL || 'mimo-v2.5';
-  const models = modelsStr.split(',').map(m => m.trim()).filter(Boolean);
   res.json({
-    ocrModels: models.length > 0 ? models : ['mimo-v2.5']
+    ocrModels: getOcrModels()
   });
 });
 
@@ -65,11 +69,8 @@ app.post('/tareaqxxi/api/ocr', requireAuth, async (req, res) => {
     if (!image) {
       return res.status(400).json({ error: 'No se recibió imagen' });
     }
-    
-    // Check if model was passed, otherwise default to first in env
-    const modelsStr = process.env.OCR_MODEL || 'mimo-v2.5';
-    const models = modelsStr.split(',').map(m => m.trim()).filter(Boolean);
-    const selectedModel = model || (models.length > 0 ? models[0] : 'mimo-v2.5');
+    const models = getOcrModels();
+    const selectedModel = models.includes(model) ? model : models[0];
 
     const result = await extractFromScreenshot(process.env.OPENCODE_GO_API_KEY, image, selectedModel);
     res.json(result);
