@@ -52,18 +52,26 @@ app.get('/tareaqxxi/app', requireAuth, (req, res) => {
 });
 
 app.get('/tareaqxxi/api/config', requireAuth, (req, res) => {
+  const modelsStr = process.env.OCR_MODEL || 'mimo-v2.5';
+  const models = modelsStr.split(',').map(m => m.trim()).filter(Boolean);
   res.json({
-    ocrModel: process.env.OCR_MODEL || 'mimo-v2.5'
+    ocrModels: models.length > 0 ? models : ['mimo-v2.5']
   });
 });
 
 app.post('/tareaqxxi/api/ocr', requireAuth, async (req, res) => {
   try {
-    const { image } = req.body;
+    const { image, model } = req.body;
     if (!image) {
       return res.status(400).json({ error: 'No se recibió imagen' });
     }
-    const result = await extractFromScreenshot(process.env.OPENCODE_GO_API_KEY, image, process.env.OCR_MODEL);
+    
+    // Check if model was passed, otherwise default to first in env
+    const modelsStr = process.env.OCR_MODEL || 'mimo-v2.5';
+    const models = modelsStr.split(',').map(m => m.trim()).filter(Boolean);
+    const selectedModel = model || (models.length > 0 ? models[0] : 'mimo-v2.5');
+
+    const result = await extractFromScreenshot(process.env.OPENCODE_GO_API_KEY, image, selectedModel);
     res.json(result);
   } catch (error) {
     console.error('OCR error:', error);

@@ -11,7 +11,7 @@ const submitBtn = document.getElementById('submit-btn');
 const retryBtn = document.getElementById('retry-btn');
 const errorText = document.getElementById('error-text');
 const notionLink = document.getElementById('notion-link');
-const modelBadge = document.getElementById('model-badge');
+const modelSelect = document.getElementById('model-select');
 
 let currentImageBase64 = null;
 
@@ -19,8 +19,14 @@ let currentImageBase64 = null;
 fetch('/tareaqxxi/api/config')
   .then(res => res.json())
   .then(data => {
-    if (data.ocrModel) {
-      modelBadge.textContent = 'Modelo OCR: ' + data.ocrModel;
+    if (data.ocrModels && data.ocrModels.length > 0) {
+      modelSelect.innerHTML = ''; // Clear default
+      data.ocrModels.forEach(model => {
+        const option = document.createElement('option');
+        option.value = model;
+        option.textContent = model;
+        modelSelect.appendChild(option);
+      });
     }
   })
   .catch(err => console.error('Error cargando config:', err));
@@ -95,7 +101,10 @@ async function processImage() {
     const response = await fetch('/tareaqxxi/api/ocr', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: currentImageBase64 })
+      body: JSON.stringify({ 
+        image: currentImageBase64,
+        model: modelSelect.value
+      })
     });
 
     if (!response.ok) {
