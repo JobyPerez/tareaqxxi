@@ -1,11 +1,17 @@
 {
   "name": "tareaqxxi",
-  "version": "1.0.0",
+  "private": true,
+  "version": "0.1.0",
   "description": "Crear tareas en Notion a partir de pantallazos de QXXI",
   "main": "server.js",
   "scripts": {
+    "build": "echo 'No hay paso de build: tareaqxxi ejecuta server.js directamente con Node.'",
     "start": "node server.js",
     "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=20.11.0",
+    "npm": ">=10.0.0"
   },
   "dependencies": {
     "dotenv": "^16.4.7",

@@ -11,12 +11,42 @@
   <header>
     <h1><img class="app-icon" src="/tareaqxxi/icon.svg" alt="">De QuaterniXXI a Notion</h1>
     <div class="header-right">
+      <span class="version-activity" id="version-activity">
+        <button
+          aria-expanded="false"
+          aria-label="Ver actividad de la versión"
+          class="app-version"
+          id="app-version-btn"
+          title="Ver actividad de la versión"
+          type="button"
+        ></button>
+        <span class="build-time" id="app-version-build-time"></span>
+        <div class="version-activity-panel" id="version-activity-panel" hidden>
+          <div class="version-activity-header">
+            <strong>Actividad reciente</strong>
+            <span id="version-activity-branch" hidden></span>
+          </div>
+          <ol class="commit-list" id="version-commit-list"></ol>
+          <p class="commit-empty" id="version-commit-empty" hidden>No hay commits disponibles en este build.</p>
+        </div>
+      </span>
       <select class="model-select" id="model-select" title="Selecciona el modelo OCR">
         <option value="mimo-v2.5">mimo-v2.5</option>
       </select>
       <a href="/tareaqxxi/logout" class="logout-btn">Salir</a>
     </div>
   </header>
+
+  <div class="app-update-banner" id="app-update-banner" hidden role="status">
+    <div class="app-update-banner-text">
+      <strong id="app-update-banner-title">Nueva versión disponible</strong>
+      <span id="app-update-banner-copy">Hay cambios en el servidor. Recarga para obtener la última versión.</span>
+    </div>
+    <div class="app-update-banner-actions">
+      <button class="primary-button" id="app-update-button" type="button">Actualizar</button>
+      <button aria-label="Cerrar aviso" class="app-update-banner-dismiss" id="app-update-dismiss" type="button">&times;</button>
+    </div>
+  </div>
 
   <main>
     <div class="paste-zone" id="paste-zone">
@@ -81,6 +111,18 @@
     </div>
   </main>
 
+  <div class="app-update-banner" id="app-update-banner-error" hidden role="alert">
+    <div class="app-update-banner-text">
+      <strong>No se pudo comprobar la versión</strong>
+      <span id="app-update-banner-error-copy"></span>
+    </div>
+    <div class="app-update-banner-actions">
+      <button class="primary-button" id="app-update-error-button" type="button">Reintentar</button>
+      <button aria-label="Cerrar aviso" class="app-update-banner-dismiss" data-dismiss="error" type="button">&times;</button>
+    </div>
+  </div>
+
+  <script src="/tareaqxxi/js/version.js"></script>
   <script src="/tareaqxxi/js/app.js"></script>
 </body>
 </html>
