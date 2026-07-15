@@ -1,6 +1,6 @@
 require('dotenv').config();
+const crypto = require('crypto');
 const express = require('express');
-const session = require('express-session');
 const path = require('path');
 const { extractFromScreenshot } = require('./lib/ocr');
 const { createTask } = require('./lib/notion');
@@ -14,7 +14,59 @@ const {
 
 const app = express();
 const PORT = process.env.PORT || 3012;
+const SESSION_DAYS = Number.parseInt(process.env.SESSION_DAYS || '30', 10);
+const SESSION_MAX_AGE = (Number.isFinite(SESSION_DAYS) && SESSION_DAYS > 0 ? SESSION_DAYS : 30) * 24 * 60 * 60 * 1000;
+const AUTH_COOKIE_NAME = 'tareaqxxi_auth';
 const VERSION_SCRIPT_ID = 'app-version-globals';
+
+function sign(value) {
+  return crypto
+    .createHmac('sha256', process.env.SESSION_SECRET)
+    .update(value)
+    .digest('base64url');
+}
+
+function parseCookies(req) {
+  const header = req.headers.cookie || '';
+  return header.split(';').reduce((cookies, part) => {
+    const index = part.indexOf('=');
+    if (index === -1) {
+      return cookies;
+    }
+    const name = part.slice(0, index).trim();
+    const value = part.slice(index + 1).trim();
+    cookies[name] = decodeURIComponent(value);
+    return cookies;
+  }, {});
+}
+
+function createAuthCookieValue() {
+  const payload = Buffer.from(JSON.stringify({
+    authenticated: true,
+    expiresAt: Date.now() + SESSION_MAX_AGE
+  })).toString('base64url');
+
+  return `${payload}.${sign(payload)}`;
+}
+
+function isAuthenticated(req) {
+  const value = parseCookies(req)[AUTH_COOKIE_NAME];
+  if (!value) {
+    return false;
+  }
+
+  const [payload, signature] = value.split('.');
+  if (!payload || !signature || signature !== sign(payload)) {
+    return false;
+  }
+
+  try {
+    const data = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
+    return data.authenticated === true && typeof data.expiresAt === 'number' && data.expiresAt > Date.now();
+  } catch (error) {
+    return false;
+  }
+}
 
 function getOcrModels() {
   const modelsStr = process.env.OCR_MODEL || 'mimo-v2.5';
@@ -47,14 +99,9 @@ function buildVersionGlobalsScript() {
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: { maxAge: 24 * 60 * 60 * 1000 }
-}));
 
 app.use('/tareaqxxi', express.static(path.join(__dirname, 'public'), {
+  index: false,
   setHeaders(res, filePath) {
     if (/\.(html?|js|css)$/i.test(filePath)) {
       res.setHeader('Cache-Control', 'no-store');
@@ -63,7 +110,7 @@ app.use('/tareaqxxi', express.static(path.join(__dirname, 'public'), {
 }));
 
 app.get('/tareaqxxi/', (req, res) => {
-  if (req.session && req.session.authenticated) {
+  if (isAuthenticated(req)) {
     return res.redirect('/tareaqxxi/app');
   }
   const html = require('fs').readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf8');
@@ -73,8 +120,11 @@ app.get('/tareaqxxi/', (req, res) => {
 });
 
 function requireAuth(req, res, next) {
-  if (req.session && req.session.authenticated) {
+  if (isAuthenticated(req)) {
     return next();
+  }
+  if (req.path.startsWith('/tareaqxxi/api/')) {
+    return res.status(401).json({ error: 'Sesión caducada. Vuelve a iniciar sesión.' });
   }
   res.redirect('/tareaqxxi/');
 }
@@ -82,14 +132,19 @@ function requireAuth(req, res, next) {
 app.post('/tareaqxxi/login', (req, res) => {
   const { username, password } = req.body;
   if (username === process.env.APP_USER && password === process.env.APP_PASS) {
-    req.session.authenticated = true;
+    res.cookie(AUTH_COOKIE_NAME, createAuthCookieValue(), {
+      httpOnly: true,
+      maxAge: SESSION_MAX_AGE,
+      path: '/tareaqxxi',
+      sameSite: 'lax'
+    });
     return res.redirect('/tareaqxxi/app');
   }
   res.redirect('/tareaqxxi/?error=1');
 });
 
 app.get('/tareaqxxi/logout', (req, res) => {
-  req.session.destroy();
+  res.clearCookie(AUTH_COOKIE_NAME, { path: '/tareaqxxi' });
   res.redirect('/tareaqxxi/');
 });
 
