@@ -14,6 +14,7 @@ const notionLink = document.getElementById('notion-link');
 const modelSelect = document.getElementById('model-select');
 
 let currentImageBase64 = null;
+let failedStep = null;
 
 // Cargar configuración inicial
 fetch('/tareaqxxi/api/config')
@@ -91,6 +92,7 @@ function handleImage(blob) {
 }
 
 async function processImage() {
+  failedStep = null;
   previewSection.style.display = 'block';
   loadingSection.style.display = 'block';
   formSection.style.display = 'none';
@@ -115,7 +117,7 @@ async function processImage() {
     const data = await response.json();
     showForm(data);
   } catch (error) {
-    showError(error.message);
+    showError(error.message, 'ocr');
   }
 }
 
@@ -142,14 +144,18 @@ function updateTemplateHint() {
 
 document.getElementById('tipo').addEventListener('input', updateTemplateHint);
 
-function showError(message) {
+function showError(message, step) {
+  failedStep = step;
   loadingSection.style.display = 'none';
   errorSection.style.display = 'block';
   errorText.textContent = message;
+  retryBtn.textContent = step === 'notion' ? 'Reintentar creación en Notion' : 'Reintentar OCR';
 }
 
 taskForm.addEventListener('submit', async (e) => {
   e.preventDefault();
+  failedStep = null;
+  errorSection.style.display = 'none';
   submitBtn.disabled = true;
   submitBtn.textContent = 'Creando...';
 
@@ -181,8 +187,8 @@ taskForm.addEventListener('submit', async (e) => {
       notionLink.href = result.page.url;
     }
   } catch (error) {
-    showError(error.message);
-    formSection.style.display = 'none';
+    showError(error.message, 'notion');
+    formSection.style.display = 'block';
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = 'Crear tarea en Notion';
@@ -192,12 +198,17 @@ taskForm.addEventListener('submit', async (e) => {
 clearBtn.addEventListener('click', resetApp);
 retryBtn.addEventListener('click', () => {
   errorSection.style.display = 'none';
-  processImage();
+  if (failedStep === 'notion') {
+    taskForm.requestSubmit();
+  } else {
+    processImage();
+  }
 });
 document.getElementById('new-task-btn').addEventListener('click', resetApp);
 
 function resetApp() {
   currentImageBase64 = null;
+  failedStep = null;
   previewImg.src = '';
   pasteZone.style.display = 'block';
   previewSection.style.display = 'none';
