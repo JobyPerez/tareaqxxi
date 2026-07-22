@@ -82,6 +82,8 @@ function handleImage(blob) {
 
     pasteZone.style.display = 'none';
     previewSection.style.display = 'block';
+    clearBtn.style.display = '';
+    submitBtn.style.display = '';
     formSection.style.display = 'none';
     resultSection.style.display = 'none';
     errorSection.style.display = 'none';
@@ -179,8 +181,10 @@ taskForm.addEventListener('submit', async (e) => {
     }
 
     const result = await response.json();
-    formSection.style.display = 'none';
-    previewSection.style.display = 'none';
+    formSection.style.display = 'block';
+    previewSection.style.display = 'block';
+    clearBtn.style.display = 'none';
+    submitBtn.style.display = 'none';
     resultSection.style.display = 'block';
 
     if (result.page && result.page.url) {
@@ -210,6 +214,8 @@ function resetApp() {
   currentImageBase64 = null;
   failedStep = null;
   previewImg.src = '';
+  clearBtn.style.display = '';
+  submitBtn.style.display = '';
   pasteZone.style.display = 'block';
   previewSection.style.display = 'none';
   loadingSection.style.display = 'none';
