@@ -14,6 +14,8 @@ const notionLink = document.getElementById('notion-link');
 const modelSelect = document.getElementById('model-select');
 const entornoGroup = document.getElementById('entorno-group');
 const entornoSelect = document.getElementById('entorno');
+const versionesGroup = document.getElementById('versiones-group');
+const versionesInput = document.getElementById('versionesCorrectoras');
 
 let currentImageBase64 = null;
 let failedStep = null;
@@ -135,6 +137,9 @@ function showForm(data) {
   document.getElementById('qxxiUrl').value = data.qxxiUrl || '';
   document.getElementById('tipo').value = data.tipo || '';
   document.getElementById('universidad').value = data.universidad || '';
+  versionesInput.value = Array.isArray(data.versionesCorrectoras)
+    ? data.versionesCorrectoras.join(', ')
+    : data.versionesCorrectoras || '';
   updateTemplateHint();
 }
 
@@ -150,6 +155,8 @@ function updateTemplateHint() {
 
   entornoGroup.hidden = !isInstallation;
   entornoSelect.disabled = !isInstallation;
+  versionesGroup.hidden = !isInstallation;
+  versionesInput.disabled = !isInstallation;
   if (isInstallation && !entornoManuallyChanged) {
     entornoSelect.value = inferEnvironment(document.getElementById('nombre').value);
   }
@@ -191,7 +198,8 @@ taskForm.addEventListener('submit', async (e) => {
     qxxiUrl: document.getElementById('qxxiUrl').value,
     tipo: document.getElementById('tipo').value,
     universidad: document.getElementById('universidad').value,
-    entorno: entornoSelect.disabled ? '' : entornoSelect.value
+    entorno: entornoSelect.disabled ? '' : entornoSelect.value,
+    versionesCorrectoras: versionesInput.disabled ? '' : versionesInput.value
   };
 
   try {
