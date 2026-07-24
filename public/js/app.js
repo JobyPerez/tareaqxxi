@@ -12,9 +12,12 @@ const retryBtn = document.getElementById('retry-btn');
 const errorText = document.getElementById('error-text');
 const notionLink = document.getElementById('notion-link');
 const modelSelect = document.getElementById('model-select');
+const entornoGroup = document.getElementById('entorno-group');
+const entornoSelect = document.getElementById('entorno');
 
 let currentImageBase64 = null;
 let failedStep = null;
+let entornoManuallyChanged = false;
 
 // Cargar configuración inicial
 fetch('/tareaqxxi/api/config')
@@ -126,6 +129,7 @@ async function processImage() {
 function showForm(data) {
   loadingSection.style.display = 'none';
   formSection.style.display = 'block';
+  entornoManuallyChanged = false;
 
   document.getElementById('nombre').value = data.nombre || '';
   document.getElementById('qxxiUrl').value = data.qxxiUrl || '';
@@ -137,14 +141,35 @@ function showForm(data) {
 function updateTemplateHint() {
   const tipo = document.getElementById('tipo').value.toLowerCase();
   const hint = document.getElementById('template-hint');
-  if (tipo.includes('actualización de versión') || tipo.includes('actualizacion de version')) {
+  const isInstallation = tipo.includes('actualización de versión') || tipo.includes('actualizacion de version');
+  if (isInstallation) {
     hint.textContent = 'Plantilla: Petición de instalación: pasos para la preparación y validación';
   } else {
     hint.textContent = 'Plantilla: Entrada QuaterniXXI petición/error de datos';
   }
+
+  entornoGroup.hidden = !isInstallation;
+  entornoSelect.disabled = !isInstallation;
+  if (isInstallation && !entornoManuallyChanged) {
+    entornoSelect.value = inferEnvironment(document.getElementById('nombre').value);
+  }
+}
+
+function inferEnvironment(nombre) {
+  const match = nombre.match(/_R(E|P)(?=\W|_|$)/i);
+  if (!match) return '';
+  return match[1].toUpperCase() === 'E' ? 'Producción' : 'Pruebas';
 }
 
 document.getElementById('tipo').addEventListener('input', updateTemplateHint);
+document.getElementById('nombre').addEventListener('input', () => {
+  if (!entornoManuallyChanged && !entornoSelect.disabled) {
+    entornoSelect.value = inferEnvironment(document.getElementById('nombre').value);
+  }
+});
+entornoSelect.addEventListener('change', () => {
+  entornoManuallyChanged = true;
+});
 
 function showError(message, step) {
   failedStep = step;
@@ -165,7 +190,8 @@ taskForm.addEventListener('submit', async (e) => {
     nombre: document.getElementById('nombre').value,
     qxxiUrl: document.getElementById('qxxiUrl').value,
     tipo: document.getElementById('tipo').value,
-    universidad: document.getElementById('universidad').value
+    universidad: document.getElementById('universidad').value,
+    entorno: entornoSelect.disabled ? '' : entornoSelect.value
   };
 
   try {
@@ -222,6 +248,7 @@ function resetApp() {
   formSection.style.display = 'none';
   resultSection.style.display = 'none';
   errorSection.style.display = 'none';
+  entornoManuallyChanged = false;
 }
 
 // === Version banner and update gate =======================================

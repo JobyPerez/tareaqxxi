@@ -7,7 +7,8 @@
   "scripts": {
     "build": "echo 'No hay paso de build: tareaqxxi ejecuta server.js directamente con Node.'",
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "test": "node --test"
   },
   "engines": {
     "node": ">=20.11.0",
