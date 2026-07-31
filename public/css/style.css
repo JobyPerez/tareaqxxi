@@ -28,17 +28,34 @@ header h1 {
   gap: 0.75rem;
 }
 
-.app-icon {
-  width: 4rem;
-  height: 2rem;
+.app-icons {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
   flex: 0 0 auto;
 }
 
-.app-icon-login {
-  display: block;
-  width: 5rem;
-  height: 2.5rem;
+.app-icons img {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 4px;
+  object-fit: contain;
+}
+
+.app-icons span {
+  color: #fff;
+  font-size: 1.1rem;
+}
+
+.app-icons-login {
+  display: flex;
+  justify-content: center;
   margin: 0 auto 0.75rem;
+}
+
+.app-icons-login img {
+  width: 2.5rem;
+  height: 2.5rem;
 }
 
 .header-right {
@@ -61,6 +78,30 @@ header h1 {
 .model-select option {
   background: #2a2a2a;
   color: #fff;
+}
+
+.prompt-settings-btn {
+  padding: 0.45rem 0.75rem;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background: transparent;
+  color: #ddd;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.prompt-settings-btn:hover,
+.prompt-settings-btn:focus-visible,
+.prompt-settings-btn.has-session-prompt {
+  border-color: #e94560;
+  color: #fff;
+  outline: none;
+}
+
+.prompt-settings-btn:disabled {
+  cursor: wait;
+  opacity: 0.5;
 }
 
 .logout-btn {
@@ -353,6 +394,90 @@ main {
   font-size: 0.9rem;
 }
 
+.prompt-dialog {
+  width: min(760px, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  margin: auto;
+  border: 1px solid #0f3460;
+  border-radius: 14px;
+  background: #16213e;
+  color: #eee;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.65);
+}
+
+.prompt-dialog::backdrop {
+  background: rgba(5, 8, 20, 0.78);
+  backdrop-filter: blur(3px);
+}
+
+.prompt-dialog-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.prompt-dialog-header,
+.prompt-dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.prompt-dialog-header h2 {
+  color: #e94560;
+  font-size: 1.25rem;
+}
+
+.prompt-dialog-header p,
+.prompt-help {
+  margin-top: 0.25rem;
+  color: #999;
+  font-size: 0.82rem;
+}
+
+.prompt-dialog-close {
+  border: 0;
+  background: transparent;
+  color: #aaa;
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.prompt-dialog label {
+  color: #ccc;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.prompt-dialog textarea {
+  width: 100%;
+  min-height: min(48vh, 420px);
+  resize: vertical;
+  padding: 0.9rem;
+  border: 1px solid #0f3460;
+  border-radius: 8px;
+  outline: none;
+  background: #10182d;
+  color: #eee;
+  font: 0.88rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.prompt-dialog textarea:focus {
+  border-color: #e94560;
+}
+
+.prompt-error {
+  color: #ff7d92;
+  font-size: 0.85rem;
+}
+
+.prompt-dialog-actions {
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
 /* === Version banner ===================================================== */
 
 .version-activity {
@@ -563,6 +688,30 @@ main {
 }
 
 @media (max-width: 640px) {
+  header {
+    align-items: flex-start;
+    padding: 1rem;
+  }
+
+  header h1 {
+    font-size: 1.1rem;
+  }
+
+  .app-icons img {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+
+  .header-right {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .prompt-dialog-actions > * {
+    flex: 1 1 100%;
+  }
+
   .version-activity {
     flex-wrap: wrap;
     gap: 0.3rem 0.4rem;

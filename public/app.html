@@ -4,12 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>De QuaterniXXI a Notion</title>
-  <link rel="icon" href="/tareaqxxi/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="/tareaqxxi/icon.svg?v=2" type="image/svg+xml">
   <link rel="stylesheet" href="/tareaqxxi/css/style.css">
 </head>
 <body>
   <header>
-    <h1><img class="app-icon" src="/tareaqxxi/icon.svg" alt="">De QuaterniXXI a Notion</h1>
+    <h1>
+      <span class="app-icons" aria-hidden="true">
+        <img src="/tareaqxxi/icon/QuaterniXXI.jpg" alt="">
+        <span>→</span>
+        <img src="/tareaqxxi/icon/Notion.png" alt="">
+      </span>
+      De QuaterniXXI a Notion
+    </h1>
     <div class="header-right">
       <span class="version-activity" id="version-activity">
         <button
@@ -33,6 +40,7 @@
       <select class="model-select" id="model-select" title="Selecciona el modelo OCR">
         <option value="mimo-v2.5">mimo-v2.5</option>
       </select>
+      <button class="prompt-settings-btn" id="prompt-settings-btn" type="button" disabled>Prompt OCR</button>
       <a href="/tareaqxxi/logout" class="logout-btn">Salir</a>
     </div>
   </header>
@@ -122,6 +130,27 @@
       </div>
     </div>
   </main>
+
+  <dialog class="prompt-dialog" id="prompt-dialog">
+    <form method="dialog" class="prompt-dialog-card" id="prompt-form">
+      <div class="prompt-dialog-header">
+        <div>
+          <h2>Prompt del OCR</h2>
+          <p id="prompt-scope-status">Usando el prompt global</p>
+        </div>
+        <button class="prompt-dialog-close" value="cancel" aria-label="Cerrar" type="submit">&times;</button>
+      </div>
+      <label for="prompt-textarea">Instrucciones enviadas al modelo</label>
+      <textarea id="prompt-textarea" maxlength="30000" required spellcheck="true"></textarea>
+      <p class="prompt-help">El cambio de sesión dura hasta cerrar esta pestaña. El cambio global se aplicará a todos los usuarios y sesiones.</p>
+      <p class="prompt-error" id="prompt-error" hidden></p>
+      <div class="prompt-dialog-actions">
+        <button class="btn-secondary" id="use-global-prompt-btn" type="button">Usar prompt global</button>
+        <button class="btn-secondary" id="save-session-prompt-btn" type="button">Solo esta sesión</button>
+        <button class="btn-primary" id="save-global-prompt-btn" type="button">Guardar para todos</button>
+      </div>
+    </form>
+  </dialog>
 
   <div class="app-update-banner" id="app-update-banner-error" hidden role="alert">
     <div class="app-update-banner-text">

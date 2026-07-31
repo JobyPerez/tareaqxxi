@@ -16,10 +16,26 @@ const entornoGroup = document.getElementById('entorno-group');
 const entornoSelect = document.getElementById('entorno');
 const versionesGroup = document.getElementById('versiones-group');
 const versionesInput = document.getElementById('versionesCorrectoras');
+const promptSettingsBtn = document.getElementById('prompt-settings-btn');
+const promptDialog = document.getElementById('prompt-dialog');
+const promptTextarea = document.getElementById('prompt-textarea');
+const promptScopeStatus = document.getElementById('prompt-scope-status');
+const promptError = document.getElementById('prompt-error');
+const saveSessionPromptBtn = document.getElementById('save-session-prompt-btn');
+const saveGlobalPromptBtn = document.getElementById('save-global-prompt-btn');
+const useGlobalPromptBtn = document.getElementById('use-global-prompt-btn');
 
 let currentImageBase64 = null;
 let failedStep = null;
 let entornoManuallyChanged = false;
+let globalOcrPrompt = '';
+let sessionOcrPrompt = '';
+
+try {
+  sessionOcrPrompt = sessionStorage.getItem('tareaqxxi_ocr_prompt') || '';
+} catch (error) {
+  console.warn('No se pudo recuperar el prompt de sesión:', error);
+}
 
 // Cargar configuración inicial
 fetch('/tareaqxxi/api/config')
@@ -34,6 +50,9 @@ fetch('/tareaqxxi/api/config')
         modelSelect.appendChild(option);
       });
     }
+    globalOcrPrompt = data.ocrPrompt || '';
+    promptSettingsBtn.disabled = !globalOcrPrompt;
+    updatePromptScope();
   })
   .catch(err => console.error('Error cargando config:', err));
 
@@ -112,7 +131,8 @@ async function processImage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
         image: currentImageBase64,
-        model: modelSelect.value
+        model: modelSelect.value,
+        prompt: sessionOcrPrompt || globalOcrPrompt
       })
     });
 
@@ -127,6 +147,80 @@ async function processImage() {
     showError(error.message, 'ocr');
   }
 }
+
+function updatePromptScope() {
+  const usesSessionPrompt = Boolean(sessionOcrPrompt);
+  promptScopeStatus.textContent = usesSessionPrompt
+    ? 'Usando un cambio solo para esta sesión'
+    : 'Usando el prompt global';
+  promptSettingsBtn.classList.toggle('has-session-prompt', usesSessionPrompt);
+  promptSettingsBtn.title = usesSessionPrompt
+    ? 'Prompt OCR modificado para esta sesión'
+    : 'Editar el prompt OCR global o para esta sesión';
+  useGlobalPromptBtn.hidden = !usesSessionPrompt;
+}
+
+function getEditedPrompt() {
+  const prompt = promptTextarea.value.trim();
+  if (!prompt) throw new Error('El prompt OCR no puede estar vacío');
+  return prompt;
+}
+
+function showPromptError(error) {
+  promptError.textContent = error.message || String(error);
+  promptError.hidden = false;
+}
+
+promptSettingsBtn.addEventListener('click', () => {
+  promptTextarea.value = sessionOcrPrompt || globalOcrPrompt;
+  promptError.hidden = true;
+  updatePromptScope();
+  promptDialog.showModal();
+});
+
+saveSessionPromptBtn.addEventListener('click', () => {
+  try {
+    sessionOcrPrompt = getEditedPrompt();
+    sessionStorage.setItem('tareaqxxi_ocr_prompt', sessionOcrPrompt);
+    updatePromptScope();
+    promptDialog.close();
+  } catch (error) {
+    showPromptError(error);
+  }
+});
+
+saveGlobalPromptBtn.addEventListener('click', async () => {
+  try {
+    const prompt = getEditedPrompt();
+    saveGlobalPromptBtn.disabled = true;
+    saveGlobalPromptBtn.textContent = 'Guardando...';
+    const response = await fetch('/tareaqxxi/api/ocr-prompt', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'No se pudo guardar el prompt');
+    globalOcrPrompt = data.ocrPrompt;
+    sessionOcrPrompt = '';
+    sessionStorage.removeItem('tareaqxxi_ocr_prompt');
+    updatePromptScope();
+    promptDialog.close();
+  } catch (error) {
+    showPromptError(error);
+  } finally {
+    saveGlobalPromptBtn.disabled = false;
+    saveGlobalPromptBtn.textContent = 'Guardar para todos';
+  }
+});
+
+useGlobalPromptBtn.addEventListener('click', () => {
+  sessionOcrPrompt = '';
+  sessionStorage.removeItem('tareaqxxi_ocr_prompt');
+  promptTextarea.value = globalOcrPrompt;
+  updatePromptScope();
+  promptDialog.close();
+});
 
 function showForm(data) {
   loadingSection.style.display = 'none';

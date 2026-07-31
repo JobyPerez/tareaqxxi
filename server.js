@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const express = require('express');
 const path = require('path');
 const { extractFromScreenshot } = require('./lib/ocr');
+const { getGlobalOcrPrompt, saveGlobalOcrPrompt, validateOcrPrompt } = require('./lib/ocr-prompt');
 const { createTask } = require('./lib/notion');
 const {
   resolveAppInfo,
@@ -100,6 +101,7 @@ function buildVersionGlobalsScript() {
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+app.use('/tareaqxxi/icon', express.static(path.join(__dirname, 'icon')));
 app.use('/tareaqxxi', express.static(path.join(__dirname, 'public'), {
   index: false,
   setHeaders(res, filePath) {
@@ -177,20 +179,31 @@ app.get('/tareaqxxi/api/app-version', requireAuth, (req, res) => {
 
 app.get('/tareaqxxi/api/config', requireAuth, (req, res) => {
   res.json({
-    ocrModels: getOcrModels()
+    ocrModels: getOcrModels(),
+    ocrPrompt: getGlobalOcrPrompt()
   });
+});
+
+app.put('/tareaqxxi/api/ocr-prompt', requireAuth, (req, res) => {
+  try {
+    const ocrPrompt = saveGlobalOcrPrompt(req.body.prompt);
+    res.json({ ocrPrompt });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 });
 
 app.post('/tareaqxxi/api/ocr', requireAuth, async (req, res) => {
   try {
-    const { image, model } = req.body;
+    const { image, model, prompt } = req.body;
     if (!image) {
       return res.status(400).json({ error: 'No se recibió imagen' });
     }
     const models = getOcrModels();
     const selectedModel = models.includes(model) ? model : models[0];
 
-    const result = await extractFromScreenshot(process.env.OPENCODE_GO_API_KEY, image, selectedModel);
+    const ocrPrompt = prompt === undefined ? getGlobalOcrPrompt() : validateOcrPrompt(prompt);
+    const result = await extractFromScreenshot(process.env.OPENCODE_GO_API_KEY, image, selectedModel, ocrPrompt);
     res.json(result);
   } catch (error) {
     console.error('OCR error:', error);
