@@ -3,24 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
   <title>De QuaterniXXI a Notion</title>
   <link rel="icon" href="/tareaqxxi/icon.svg?v=2" type="image/svg+xml">
   <link rel="stylesheet" href="/tareaqxxi/css/style.css">
 </head>
 <body class="login-body">
   <div class="login-container">
-    <h1>
+    <div class="login-brand">
       <span class="app-icons app-icons-login" aria-hidden="true">
         <img src="/tareaqxxi/icon/QuaterniXXI.jpg" alt="">
-        <span>→</span>
+        <span class="icon-connector">→</span>
         <img src="/tareaqxxi/icon/Notion.png" alt="">
       </span>
-      De QuaterniXXI a Notion
-    </h1>
-    <p class="subtitle">Crear tareas en Notion desde pantallazos QXXI</p>
+      <span class="eyebrow">QXXI Bridge</span>
+    </div>
+    <h1>Bienvenido de nuevo</h1>
+    <p class="subtitle">Accede para convertir capturas de QuaterniXXI en tareas de Notion.</p>
     <form action="/tareaqxxi/login" method="POST" class="login-form">
-      <input type="text" name="username" placeholder="Usuario" required autofocus>
-      <input type="password" name="password" placeholder="Contraseña" required>
+      <label for="username">Usuario</label>
+      <input id="username" type="text" name="username" placeholder="Tu usuario" autocomplete="username" required autofocus>
+      <label for="password">Contraseña</label>
+      <input id="password" type="password" name="password" placeholder="Tu contraseña" autocomplete="current-password" required>
       <button type="submit">Entrar</button>
     </form>
     <p class="error" id="error-msg"></p>

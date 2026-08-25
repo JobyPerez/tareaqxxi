@@ -1,32 +1,32 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
   <title>De QuaterniXXI a Notion</title>
   <link rel="icon" href="/tareaqxxi/icon.svg?v=2" type="image/svg+xml">
   <link rel="stylesheet" href="/tareaqxxi/css/style.css">
 </head>
+
 <body>
-  <header>
-    <h1>
+  <header class="app-header">
+    <a class="brand" href="/tareaqxxi/app" aria-label="Inicio de QXXI Bridge">
       <span class="app-icons" aria-hidden="true">
         <img src="/tareaqxxi/icon/QuaterniXXI.jpg" alt="">
-        <span>→</span>
+        <span class="icon-connector">→</span>
         <img src="/tareaqxxi/icon/Notion.png" alt="">
       </span>
-      De QuaterniXXI a Notion
-    </h1>
+      <span class="brand-copy">
+        <strong>QXXI Bridge</strong>
+        <small>QuaterniXXI a Notion</small>
+      </span>
+    </a>
     <div class="header-right">
       <span class="version-activity" id="version-activity">
-        <button
-          aria-expanded="false"
-          aria-label="Ver actividad de la versión"
-          class="app-version"
-          id="app-version-btn"
-          title="Ver actividad de la versión"
-          type="button"
-        ></button>
+        <button aria-expanded="false" aria-label="Ver actividad de la versión" class="app-version" id="app-version-btn"
+          title="Ver actividad de la versión" type="button"></button>
         <span class="build-time" id="app-version-build-time"></span>
         <div class="version-activity-panel" id="version-activity-panel" hidden>
           <div class="version-activity-header">
@@ -52,34 +52,58 @@
     </div>
     <div class="app-update-banner-actions">
       <button class="primary-button" id="app-update-button" type="button">Actualizar</button>
-      <button aria-label="Cerrar aviso" class="app-update-banner-dismiss" id="app-update-dismiss" type="button">&times;</button>
+      <button aria-label="Cerrar aviso" class="app-update-banner-dismiss" id="app-update-dismiss"
+        type="button">&times;</button>
     </div>
   </div>
 
   <main>
-    <div class="paste-zone" id="paste-zone">
-      <div class="paste-icon">📋</div>
-      <p>Pega aquí un pantallazo con <kbd>Ctrl+V</kbd></p>
-      <p class="hint">La captura debe mostrar una issue de QXXI (INV-*)</p>
+    <section class="intro" aria-labelledby="page-title">
+      <p>Pon el pantallazo de una entrada de QuaterniXXI, la IA saca los datos, revísalos y envíalos a Notion.</p>
+    </section>
+
+    <div class="paste-zone" id="paste-zone" role="button" tabindex="0"
+      aria-label="Seleccionar o pegar una captura de QuaterniXXI">
+      <div class="paste-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M8 3.5h8M9 2h6a1 1 0 0 1 1 1v2H8V3a1 1 0 0 1 1-1Z" />
+          <path d="M16 4h2a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M12 9v7m-3-3 3 3 3-3" />
+        </svg>
+      </div>
+      <div class="paste-copy">
+        <strong>Pega o selecciona una captura</strong>
+        <p>Usa <kbd>Ctrl</kbd> + <kbd>V</kbd>, arrastra el archivo o haz clic para buscarlo</p>
+      </div>
+      <span class="paste-action">Seleccionar imagen</span>
+      <p class="hint"><span aria-hidden="true">●</span> Compatible con entradas QXXI identificadas como INV-*</p>
     </div>
 
     <div class="extraction-layout">
       <div class="preview-section" id="preview-section" style="display: none;">
-        <h2>Vista previa</h2>
+        <div class="section-heading">
+          <div><span class="step-label">Paso 1</span>
+            <h2>Captura original</h2>
+          </div>
+          <button class="btn-secondary" id="clear-btn">Cambiar imagen</button>
+        </div>
         <div class="image-preview">
           <img id="preview-img" src="" alt="Pantallazo">
         </div>
-        <button class="btn-secondary" id="clear-btn">Limpiar</button>
       </div>
 
       <div class="extraction-details">
         <div class="loading-section" id="loading-section" style="display: none;">
           <div class="spinner"></div>
-          <p>Extrayendo datos con IA...</p>
+          <strong>Analizando la captura</strong>
+          <p>La IA está identificando los datos de la issue.</p>
         </div>
 
         <div class="form-section" id="form-section" style="display: none;">
-          <h2>Datos extraídos</h2>
+          <div class="section-heading">
+            <div><span class="step-label">Paso 2</span>
+              <h2>Revisa los datos</h2>
+            </div>
+          </div>
           <form id="task-form">
             <div class="form-group">
               <label for="nombre">Nombre (título INV-*)</label>
@@ -108,7 +132,8 @@
             </div>
             <div class="form-group" id="versiones-group" hidden>
               <label for="versionesCorrectoras">Versión(es) Correctora(s)</label>
-              <input type="text" id="versionesCorrectoras" name="versionesCorrectoras" placeholder="Ej.: 25.3.5, 25.3.6" disabled>
+              <input type="text" id="versionesCorrectoras" name="versionesCorrectoras" placeholder="Ej.: 25.3.5, 25.3.6"
+                disabled>
             </div>
             <button type="submit" class="btn-primary" id="submit-btn">Crear tarea en Notion</button>
           </form>
@@ -146,7 +171,8 @@
       </div>
       <label for="prompt-textarea">Instrucciones enviadas al modelo</label>
       <textarea id="prompt-textarea" maxlength="30000" required spellcheck="true"></textarea>
-      <p class="prompt-help">El cambio de sesión dura hasta cerrar esta pestaña. El cambio global se aplicará a todos los usuarios y sesiones.</p>
+      <p class="prompt-help">El cambio de sesión dura hasta cerrar esta pestaña. El cambio global se aplicará a todos
+        los usuarios y sesiones.</p>
       <p class="prompt-error" id="prompt-error" hidden></p>
       <div class="prompt-dialog-actions">
         <button class="btn-secondary" id="use-global-prompt-btn" type="button">Usar prompt global</button>
@@ -163,11 +189,13 @@
     </div>
     <div class="app-update-banner-actions">
       <button class="primary-button" id="app-update-error-button" type="button">Reintentar</button>
-      <button aria-label="Cerrar aviso" class="app-update-banner-dismiss" data-dismiss="error" type="button">&times;</button>
+      <button aria-label="Cerrar aviso" class="app-update-banner-dismiss" data-dismiss="error"
+        type="button">&times;</button>
     </div>
   </div>
 
   <script src="/tareaqxxi/js/version.js"></script>
   <script src="/tareaqxxi/js/app.js"></script>
 </body>
+
 </html>

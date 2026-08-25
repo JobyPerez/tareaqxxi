@@ -80,6 +80,13 @@ pasteZone.addEventListener('click', () => {
   input.click();
 });
 
+pasteZone.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    pasteZone.click();
+  }
+});
+
 pasteZone.addEventListener('dragover', (e) => {
   e.preventDefault();
   pasteZone.classList.add('active');
