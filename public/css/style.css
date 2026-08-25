@@ -119,12 +119,14 @@ header h1 {
 }
 
 main {
-  max-width: 700px;
+  max-width: 1280px;
   margin: 2rem auto;
   padding: 0 1rem;
 }
 
 .paste-zone {
+  max-width: 700px;
+  margin-inline: auto;
   border: 3px dashed #0f3460;
   border-radius: 12px;
   padding: 4rem 2rem;
@@ -165,6 +167,10 @@ main {
   margin-top: 2rem;
 }
 
+.extraction-layout {
+  display: grid;
+}
+
 .preview-section h2 {
   margin-bottom: 1rem;
   color: #e94560;
@@ -203,6 +209,27 @@ main {
 
 .form-section {
   margin-top: 2rem;
+}
+
+@media (min-width: 900px) {
+  .extraction-layout {
+    grid-template-columns: minmax(0, 3fr) minmax(360px, 2fr);
+    align-items: start;
+    gap: 2rem;
+  }
+
+  .image-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 240px;
+    background: #10182d;
+  }
+
+  .image-preview img {
+    max-height: calc(100vh - 13rem);
+    object-fit: contain;
+  }
 }
 
 .form-section h2 {

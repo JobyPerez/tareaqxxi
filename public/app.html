@@ -63,70 +63,74 @@
       <p class="hint">La captura debe mostrar una issue de QXXI (INV-*)</p>
     </div>
 
-    <div class="preview-section" id="preview-section" style="display: none;">
-      <h2>Vista previa</h2>
-      <div class="image-preview">
-        <img id="preview-img" src="" alt="Pantallazo">
+    <div class="extraction-layout">
+      <div class="preview-section" id="preview-section" style="display: none;">
+        <h2>Vista previa</h2>
+        <div class="image-preview">
+          <img id="preview-img" src="" alt="Pantallazo">
+        </div>
+        <button class="btn-secondary" id="clear-btn">Limpiar</button>
       </div>
-      <button class="btn-secondary" id="clear-btn">Limpiar</button>
-    </div>
 
-    <div class="loading-section" id="loading-section" style="display: none;">
-      <div class="spinner"></div>
-      <p>Extrayendo datos con IA...</p>
-    </div>
+      <div class="extraction-details">
+        <div class="loading-section" id="loading-section" style="display: none;">
+          <div class="spinner"></div>
+          <p>Extrayendo datos con IA...</p>
+        </div>
 
-    <div class="form-section" id="form-section" style="display: none;">
-      <h2>Datos extraídos</h2>
-      <form id="task-form">
-        <div class="form-group">
-          <label for="nombre">Nombre (título INV-*)</label>
-          <input type="text" id="nombre" name="nombre" required>
+        <div class="form-section" id="form-section" style="display: none;">
+          <h2>Datos extraídos</h2>
+          <form id="task-form">
+            <div class="form-group">
+              <label for="nombre">Nombre (título INV-*)</label>
+              <input type="text" id="nombre" name="nombre" required>
+            </div>
+            <div class="form-group">
+              <label for="qxxiUrl">URL QXXI</label>
+              <input type="url" id="qxxiUrl" name="qxxiUrl" placeholder="https://qxxi.universitasxxi.com/browse/...">
+            </div>
+            <div class="form-group">
+              <label for="tipo">Tipo</label>
+              <input type="text" id="tipo" name="tipo" placeholder="Tipo de solicitud">
+              <p class="template-hint" id="template-hint"></p>
+            </div>
+            <div class="form-group">
+              <label for="universidad">Universidad</label>
+              <input type="text" id="universidad" name="universidad" placeholder="Acrónimo (ej: UC3M)">
+            </div>
+            <div class="form-group" id="entorno-group" hidden>
+              <label for="entorno">Entorno</label>
+              <select id="entorno" name="entorno" disabled required>
+                <option value="" disabled>Selecciona un entorno</option>
+                <option value="Producción">Producción</option>
+                <option value="Pruebas">Pruebas</option>
+              </select>
+            </div>
+            <div class="form-group" id="versiones-group" hidden>
+              <label for="versionesCorrectoras">Versión(es) Correctora(s)</label>
+              <input type="text" id="versionesCorrectoras" name="versionesCorrectoras" placeholder="Ej.: 25.3.5, 25.3.6" disabled>
+            </div>
+            <button type="submit" class="btn-primary" id="submit-btn">Crear tarea en Notion</button>
+          </form>
         </div>
-        <div class="form-group">
-          <label for="qxxiUrl">URL QXXI</label>
-          <input type="url" id="qxxiUrl" name="qxxiUrl" placeholder="https://qxxi.universitasxxi.com/browse/...">
-        </div>
-        <div class="form-group">
-          <label for="tipo">Tipo</label>
-          <input type="text" id="tipo" name="tipo" placeholder="Tipo de solicitud">
-          <p class="template-hint" id="template-hint"></p>
-        </div>
-        <div class="form-group">
-          <label for="universidad">Universidad</label>
-          <input type="text" id="universidad" name="universidad" placeholder="Acrónimo (ej: UC3M)">
-        </div>
-        <div class="form-group" id="entorno-group" hidden>
-          <label for="entorno">Entorno</label>
-          <select id="entorno" name="entorno" disabled required>
-            <option value="" disabled>Selecciona un entorno</option>
-            <option value="Producción">Producción</option>
-            <option value="Pruebas">Pruebas</option>
-          </select>
-        </div>
-        <div class="form-group" id="versiones-group" hidden>
-          <label for="versionesCorrectoras">Versión(es) Correctora(s)</label>
-          <input type="text" id="versionesCorrectoras" name="versionesCorrectoras" placeholder="Ej.: 25.3.5, 25.3.6" disabled>
-        </div>
-        <button type="submit" class="btn-primary" id="submit-btn">Crear tarea en Notion</button>
-      </form>
-    </div>
 
-    <div class="result-section" id="result-section" style="display: none;">
-      <div class="success-message">
-        <span class="success-icon">✓</span>
-        <p>Tarea creada en Notion</p>
-        <div class="result-actions">
-          <a id="notion-link" href="#" target="_blank" class="btn-primary">Abrir en Notion</a>
-          <button class="btn-secondary" id="new-task-btn">Nueva tarea</button>
+        <div class="result-section" id="result-section" style="display: none;">
+          <div class="success-message">
+            <span class="success-icon">✓</span>
+            <p>Tarea creada en Notion</p>
+            <div class="result-actions">
+              <a id="notion-link" href="#" target="_blank" class="btn-primary">Abrir en Notion</a>
+              <button class="btn-secondary" id="new-task-btn">Nueva tarea</button>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
 
-    <div class="error-section" id="error-section" style="display: none;">
-      <div class="error-message">
-        <p id="error-text"></p>
-        <button class="btn-secondary" id="retry-btn">Reintentar</button>
+        <div class="error-section" id="error-section" style="display: none;">
+          <div class="error-message">
+            <p id="error-text"></p>
+            <button class="btn-secondary" id="retry-btn">Reintentar</button>
+          </div>
+        </div>
       </div>
     </div>
   </main>
