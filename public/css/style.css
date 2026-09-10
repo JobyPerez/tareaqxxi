@@ -195,7 +195,7 @@ textarea:focus-visible,
 }
 
 .model-select {
-  max-width: 170px;
+  max-width: 240px;
   padding: 0.4rem 2rem 0.4rem 0.7rem;
   cursor: pointer;
 }
@@ -975,7 +975,7 @@ kbd {
   }
 
   .model-select {
-    max-width: 126px;
+    max-width: 170px;
   }
 
   .prompt-settings-btn {

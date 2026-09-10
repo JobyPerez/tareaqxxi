@@ -2,7 +2,7 @@ require('dotenv').config();
 const crypto = require('crypto');
 const express = require('express');
 const path = require('path');
-const { extractFromScreenshot } = require('./lib/ocr');
+const { extractFromScreenshot, getProviderForModel } = require('./lib/ocr');
 const { getGlobalOcrPrompt, saveGlobalOcrPrompt, validateOcrPrompt } = require('./lib/ocr-prompt');
 const { createTask } = require('./lib/notion');
 const {
@@ -179,7 +179,7 @@ app.get('/tareaqxxi/api/app-version', requireAuth, (req, res) => {
 
 app.get('/tareaqxxi/api/config', requireAuth, (req, res) => {
   res.json({
-    ocrModels: getOcrModels(),
+    ocrModels: getOcrModels().map(model => ({ id: model, provider: getProviderForModel(model) })),
     ocrPrompt: getGlobalOcrPrompt()
   });
 });

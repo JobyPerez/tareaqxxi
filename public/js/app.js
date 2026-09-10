@@ -45,8 +45,8 @@ fetch('/tareaqxxi/api/config')
       modelSelect.innerHTML = ''; // Clear default
       data.ocrModels.forEach(model => {
         const option = document.createElement('option');
-        option.value = model;
-        option.textContent = model;
+        option.value = model.id;
+        option.textContent = `${model.id} (${model.provider})`;
         modelSelect.appendChild(option);
       });
     }
