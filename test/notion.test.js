@@ -4,6 +4,7 @@ const { afterEach, test } = require('node:test');
 const {
   createTask,
   getInstallationEnvironment,
+  getMadridNowForNotion,
   normalizeCorrectiveVersions,
   selectTemplate
 } = require('../lib/notion');
@@ -105,7 +106,7 @@ test('relates existing versions and creates missing versions for installation ta
       };
     }
 
-    if (body.parent.database_id) {
+    if (body.parent.database_id === '291d9277-e2b6-42d1-8a05-002087f4dc89') {
       createdVersionBody = body;
       return {
         ok: true,
@@ -165,4 +166,38 @@ test('reports a clear error when Notion returns an HTML outage page', async () =
     }),
     /Notion no está disponible temporalmente \(HTTP 522\)/
   );
+});
+
+test('sets Fecha realización immediately so day/hour do not depend on the async template job', async () => {
+  let requestBody;
+  let requestHeaders;
+
+  global.fetch = async (_url, options) => {
+    requestBody = JSON.parse(options.body);
+    requestHeaders = options.headers;
+    return {
+      ok: true,
+      json: async () => ({ id: 'page-id' })
+    };
+  };
+
+  await createTask('notion-key', {
+    nombre: 'INV-12345 corregir datos',
+    tipo: 'Error de datos',
+    qxxiUrl: '',
+    universidad: ''
+  });
+
+  const start = requestBody.properties['Fecha realización']?.date?.start;
+  assert.match(start, /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{2}:\d{2}$/);
+  assert.equal(requestHeaders['Notion-Version'], '2022-06-28');
+  assert.equal(requestBody.parent.database_id, '16bce85f-6aef-4da5-ad2c-a03a4e9e2c6e');
+  assert.equal(requestBody.template.template_id, '9ec447de-d54e-4f5d-b6e9-c89ed957b900');
+});
+
+test('formats Madrid now with the correct DST offset', () => {
+  const summer = getMadridNowForNotion(new Date('2026-09-17T11:00:00.000Z'));
+  const winter = getMadridNowForNotion(new Date('2026-01-17T11:00:00.000Z'));
+  assert.ok(summer.startsWith('2026-09-17T13:00:00.000+02:00'), summer);
+  assert.ok(winter.startsWith('2026-01-17T12:00:00.000+01:00'), winter);
 });
