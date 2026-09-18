@@ -35,6 +35,45 @@ test('keeps an OCR title that has no slash', async () => {
   assert.equal(result.nombre, 'IINV-12345 título');
 });
 
+test('keeps inner slashes in a title that already starts with INV-', async () => {
+  global.fetch = async () => ({
+    ok: true,
+    json: async () => ({
+      choices: [{ message: { content: '{"nombre":"INV-27530 (erperez) Error pantalla de ingresos 2025/000001686"}' } }]
+    })
+  });
+
+  const result = await extractFromScreenshot('api-key', 'image', 'mimo-v2.5');
+
+  assert.equal(result.nombre, 'INV-27530 (erperez) Error pantalla de ingresos 2025/000001686');
+});
+
+test('strips the UXXI-INV prefix but keeps inner slashes of the title', async () => {
+  global.fetch = async () => ({
+    ok: true,
+    json: async () => ({
+      choices: [{ message: { content: '{"nombre":"UXXI-INV / INV-27530 (erperez) Error pantalla de ingresos 2025/000001686"}' } }]
+    })
+  });
+
+  const result = await extractFromScreenshot('api-key', 'image', 'mimo-v2.5');
+
+  assert.equal(result.nombre, 'INV-27530 (erperez) Error pantalla de ingresos 2025/000001686');
+});
+
+test('keeps a title with a slash when it has no INV- code', async () => {
+  global.fetch = async () => ({
+    ok: true,
+    json: async () => ({
+      choices: [{ message: { content: '{"nombre":"Error pantalla de ingresos 2025/000001686"}' } }]
+    })
+  });
+
+  const result = await extractFromScreenshot('api-key', 'image', 'mimo-v2.5');
+
+  assert.equal(result.nombre, 'Error pantalla de ingresos 2025/000001686');
+});
+
 test('sends a custom prompt to the OCR model', async () => {
   let requestBody;
   global.fetch = async (url, options) => {
